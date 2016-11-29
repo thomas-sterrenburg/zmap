@@ -30,6 +30,7 @@ extern probe_module_t module_upnp;
 extern probe_module_t module_dns;
 extern probe_module_t module_bacnet;
 // ADD YOUR MODULE HERE
+extern probe_module_t module_fingerprint;
 
 probe_module_t* probe_modules[] = {
 	&module_tcp_synscan,
@@ -41,8 +42,9 @@ probe_module_t* probe_modules[] = {
 	&module_upnp,
 	&module_dns,
 	&module_tcp_cisco_backdoor,
-	&module_bacnet
+	&module_bacnet,
 	// ADD YOUR MODULE HERE
+	&module_fingerprint
 };
 
 probe_module_t* get_probe_module_by_name(const char* name)

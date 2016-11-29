@@ -8,6 +8,7 @@ include_directories(
 
 # ADD YOUR PROBE MODULE HERE
 set(EXTRA_PROBE_MODULES
+    probe_modules/module_fingerprint.c
 )
 
 # ADD YOUR OUTPUT MODULE HERE
