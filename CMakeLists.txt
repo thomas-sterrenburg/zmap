@@ -21,6 +21,19 @@ if("${CMAKE_SYSTEM_NAME}" MATCHES "FreeBSD" OR "${CMAKE_SYSTEM_NAME}" MATCHES "N
     set(BSD "YES")
 endif()
 
+# Look for required libraries
+SET(requiredlibs)
+
+FIND_PACKAGE(CURL)
+IF(CURL_FOUND)
+    message("-- CURL found, linking")
+    INCLUDE_DIRECTORIES(${CURL_INCLUDE_DIR})
+    SET(requiredlibs ${requiredlibs} ${CURL_LIBRARIES} )
+ELSE(CURL_FOUND)
+    MESSAGE(FATAL_ERROR "Could not find the CURL library and development files.")
+ENDIF(CURL_FOUND)
+
+
 # Hardening and warnings for building with gcc
 # Maybe add -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations
 set(GCCWARNINGS
