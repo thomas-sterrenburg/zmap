@@ -200,6 +200,7 @@ target_link_libraries(
     ${REDIS_LIBS}
     ${JSON_LIBRARIES}
     ${MONGO_LIBRARIES}
+    curl
 )
 
 target_link_libraries(

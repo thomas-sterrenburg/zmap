@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <assert.h>
+#include <curl/curl.h>
 
 #include "../../lib/includes.h"
 #include "../fieldset.h"
@@ -23,9 +24,58 @@
 probe_module_t module_fingerprint;
 static uint32_t num_ports;
 
+// libcurl specific variables
+static CURL *curl;
+
+const char * header_filter[3] = { "Server", "Accept", "Cache" };
+const int header_filter_size  = sizeof(header_filter) / sizeof(header_filter[0]);
+
+static size_t header_callback(char *buffer, size_t size, size_t nitems, void *userdata) {
+    printf("-- header: %s", buffer);
+
+    if(http_header_filter_func(buffer) >= 0)
+        printf(" (matching string with %s)\n", header_filter[http_header_filter_func(buffer)]);
+
+    return nitems * size;
+}
+
+/** Search header strings for presence of header filter attributes
+ *
+ * @param buffer    the string in which the substring is searched
+ * @return          1 if the substring is found, or 0 if the substring is not found.
+ */
+int http_header_filter_func(char *buffer) {
+    for(int i = 0; i < header_filter_size; i ++) {
+        if(strstr(buffer, header_filter[i]) != NULL)
+            return i;
+    }
+
+    return -1;
+}
+
 int fingerprint_global_initialize(struct state_conf *state)
 {
 	num_ports = state->source_port_last - state->source_port_first + 1;
+
+    /* Initialize curllib */
+    curl_global_init(CURL_GLOBAL_ALL);
+
+	curl = curl_easy_init();
+
+    if(curl == NULL)
+        return EXIT_FAILURE;
+
+    /* Get the resource without a body */
+    curl_easy_setopt(curl, CURLOPT_NOBODY, 1L);
+
+    curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_callback);
+
+    curl_easy_setopt(curl, CURLOPT_URL, "http://example.com");
+
+    /* Perform the request */
+    printf("--- Executing perform now\n");
+    curl_easy_perform(curl);
+
 	return EXIT_SUCCESS;
 }
 
